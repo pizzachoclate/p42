@@ -1,0 +1,137 @@
+$base-font-size:  20px;
+$radius:  18vmin;
+$base-color: white;
+$face-color: #d80000;
+
+$anim-duration: 2s;
+$anim-delay: 500ms;
+$anim-ease: ease-in;
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: #1d1d1d;
+}
+
+body {
+  font-size: $base-font-size;
+  font-family: Helvetica, serif;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.clock,
+.clock-face {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.letter {
+  // center all stuff (flex-box is bad b/c of position absolute)
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  margin-left: -$base-font-size/2;
+  margin-top: -$base-font-size;
+  width: $base-font-size;
+  line-height: $base-font-size * 2;
+  text-align: center;
+  word-break: break-all;
+}
+
+.clock {
+  transform-origin: center center;
+  animation: spin $anim-duration $anim-delay $anim-ease infinite;
+
+  .tick {
+    transform-origin: center;
+    color: $base-color;
+
+    @for $i from 0 through 12 {
+      &:nth-child(#{$i+1}) {
+        transform: rotate(30deg*$i) translateY(-$radius);
+
+        // first
+        @if $i == 0 {
+          color: $face-color;
+          animation: color-out $anim-duration $anim-delay infinite;
+        }
+
+        // last
+        @if $i == 11 {
+          animation: color-in-out $anim-duration $anim-delay infinite;
+        }
+
+        // second last
+        @if $i == 10 {
+          animation: color-in $anim-duration $anim-delay infinite;
+        }
+      }
+    }
+
+    &:nth-of-type(odd):before {
+      content: 'I';
+    }
+
+    &:nth-of-type(even):before {
+      content: 'O'; // or A, dunno
+    }
+  }
+}
+
+.clock-face {
+  .tick-top,
+  .tick-bottom {
+    transform-origin: top center;
+    color: $face-color;
+  }
+
+  .tick-top {
+    transform: translateY(calc(#{-$radius} - #{$base-font-size * 2}));
+
+    &:before {
+      content: 'T';
+    }
+  }
+
+  .tick-bottom {
+    transform: translateY(calc(#{-$radius} + #{$base-font-size * 2}));
+
+    &:before {
+      content: 'CK';  // or C, or K, English is weird sometimes
+    }
+  }
+}
+
+@keyframes spin {
+  0%    { transform: rotate(0deg); }
+  20%   { transform: rotate(30deg); }
+  50%   { transform: rotate(30deg); }
+  70%   { transform: rotate(60deg); }
+  100%  { transform: rotate(60deg); }
+}
+
+@keyframes color-out {
+  0%    { color: $face-color; }
+  50%   { color: $base-color; }
+  100%  { color: $base-color; }
+}
+
+@keyframes color-in-out {
+  0%    { color: $base-color; }
+  50%   { color: $face-color; }
+  50%   { color: $face-color; }
+  100%  { color: $base-color; }
+}
+
+@keyframes color-in {
+  0%    { color: $base-color; }
+  50%   { color: $base-color; }
+  100%  { color: $face-color; }
+}
